@@ -1,0 +1,17 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+npm-debug.log*
+.DS_Store
+dev.log
+vite.log
+vite2.log
+*.tsbuildinfo
+
+# Fichiers personnels / maquettes non destinés au dépôt
+*.jpeg
+*.jpg
+Maquette*.pdf
+maquette*
