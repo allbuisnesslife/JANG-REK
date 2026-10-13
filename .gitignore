@@ -13,5 +13,5 @@ vite2.log
 # Fichiers personnels / maquettes non destinés au dépôt
 *.jpeg
 *.jpg
-Maquette*.pdf
-maquette*
+/Maquette*.pdf
+/maquette*
