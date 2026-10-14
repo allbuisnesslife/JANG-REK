@@ -1,6 +1,8 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
+import Login from "./pages/Login";
+import { loadProfile, needsLogin, endSession, type AuthProfile } from "./auth";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Maquette = lazy(() => import("./pages/Maquette"));
@@ -23,8 +25,29 @@ function PageLoader() {
 }
 
 export default function App() {
+  const [profile, setProfile] = useState<AuthProfile | null>(() => loadProfile());
+  const [authed, setAuthed] = useState(() => {
+    const p = loadProfile();
+    return !needsLogin(p);
+  });
+
+  function handleLogin(p: AuthProfile) {
+    setProfile(p);
+    setAuthed(true);
+  }
+
+  function handleLogout() {
+    endSession();
+    setAuthed(false);
+    setProfile(loadProfile());
+  }
+
+  if (!authed) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
-    <Layout>
+    <Layout onLogout={handleLogout} userName={profile?.name} userObjective={profile?.objective}>
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<Dashboard />} />

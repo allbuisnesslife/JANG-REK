@@ -48,7 +48,17 @@ export const NAV = [
   { to: "/parametres", label: "Paramètres", icon: "settings" },
 ];
 
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarContent({
+  onNavigate,
+  onLogout,
+  userName,
+  userObjective,
+}: {
+  onNavigate?: () => void;
+  onLogout?: () => void;
+  userName?: string;
+  userObjective?: number;
+}) {
   const { data } = useApp();
   return (
     <div className="flex h-full flex-col">
@@ -87,17 +97,43 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="border-t border-white/10 px-5 py-4 text-xs text-brand-100/70">
+        {userName && (
+          <p className="mb-1 font-medium text-white">
+            {userName}
+            {typeof userObjective === "number" && (
+              <span className="text-brand-200"> · objectif {userObjective}/20</span>
+            )}
+          </p>
+        )}
         <p className="font-medium text-white">« Chaque cours compte.</p>
         <p className="font-medium text-white">Chaque note te fait progresser. »</p>
         <p className="mt-2">
           Objectif : <span className="font-semibold text-white">{data.goals.general}/20</span>
         </p>
+        {onLogout && (
+          <button
+            className="mt-3 w-full rounded-lg border border-white/20 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/10"
+            onClick={onLogout}
+          >
+            Se déconnecter
+          </button>
+        )}
       </div>
     </div>
   );
 }
 
-export default function Layout({ children }: { children: ReactNode }) {
+export default function Layout({
+  children,
+  onLogout,
+  userName,
+  userObjective,
+}: {
+  children: ReactNode;
+  onLogout?: () => void;
+  userName?: string;
+  userObjective?: number;
+}) {
   const [open, setOpen] = useState(false);
   const { data } = useApp();
   const actions = useActions();
@@ -110,7 +146,7 @@ export default function Layout({ children }: { children: ReactNode }) {
     <div className="min-h-screen">
       {/* Sidebar desktop */}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 bg-brand-950 lg:block">
-        <SidebarContent />
+        <SidebarContent onLogout={onLogout} userName={userName} userObjective={userObjective} />
       </aside>
 
       {/* Sidebar mobile */}
@@ -118,7 +154,12 @@ export default function Layout({ children }: { children: ReactNode }) {
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-slate-950/60" onClick={() => setOpen(false)} />
           <aside className="absolute inset-y-0 left-0 w-72 bg-brand-950 shadow-2xl">
-            <SidebarContent onNavigate={() => setOpen(false)} />
+            <SidebarContent
+              onNavigate={() => setOpen(false)}
+              onLogout={onLogout}
+              userName={userName}
+              userObjective={userObjective}
+            />
           </aside>
         </div>
       )}

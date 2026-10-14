@@ -1,10 +1,11 @@
 import { Suspense, type ComponentType } from "react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeEach } from "vitest";
 import { renderToString } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import App from "./App";
 import { AppProvider, __resetState } from "./store/store";
 import { createInitialState, createDemoState } from "./store/initialState";
+import { saveProfile, startSession, clearProfile } from "./auth";
 
 import Dashboard from "./pages/Dashboard";
 import Maquette from "./pages/Maquette";
@@ -43,6 +44,12 @@ function renderPage(Page: ComponentType) {
 }
 
 describe("Rendu de toutes les pages (aucune erreur d'exécution)", () => {
+  beforeEach(() => {
+    clearProfile();
+    saveProfile({ name: "Test", objective: 15 });
+    startSession();
+  });
+
   for (const [route, Page] of PAGES) {
     it(`rend ${route}`, () => {
       const html = renderPage(Page);
@@ -62,6 +69,19 @@ describe("Rendu de toutes les pages (aucune erreur d'exécution)", () => {
     expect(html).toContain("ABL-GOAL");
     expect(html).toContain("Chaque cours compte");
     expect(html).toContain("Tableau de bord");
+  });
+
+  it("l'écran de connexion s'affiche sans profil", () => {
+    clearProfile();
+    const html = renderToString(
+      <MemoryRouter>
+        <AppProvider>
+          <App />
+        </AppProvider>
+      </MemoryRouter>
+    );
+    expect(html).toContain("Créer ton profil");
+    expect(html).toContain("pas limité à 15");
   });
 
   it("signale des données insuffisantes sans aucune note", () => {
