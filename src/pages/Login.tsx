@@ -8,6 +8,7 @@ import {
   type AuthProfile,
 } from "../auth";
 import { useActions } from "../store/store";
+import logoUrl from "../assets/logo.png";
 
 type Mode = "create" | "pin";
 
@@ -83,12 +84,11 @@ export default function Login({ onLogin }: { onLogin: (p: AuthProfile) => void }
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 dark:bg-slate-950">
       <div className="w-full max-w-md">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-600 text-white shadow-lg shadow-brand-600/30">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" />
-            </svg>
-          </div>
+          <img
+            src={logoUrl}
+            alt="Logo ABL-GOAL"
+            className="mx-auto mb-3 h-20 w-20 rounded-2xl object-cover shadow-lg ring-1 ring-slate-200 dark:ring-slate-700"
+          />
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">ABL-GOAL</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             « Chaque cours compte. Chaque note te fait progresser. »

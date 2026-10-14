@@ -1,0 +1,53 @@
+{
+  "name": "ABL-GOAL — Assistant de réussite en L2 Géomatique",
+  "short_name": "ABL-GOAL",
+  "description": "Chaque cours compte. Chaque note te fait progresser. Assistant de réussite en L2 Géomatique.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "id": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "orientation": "any",
+  "background_color": "#ffffff",
+  "theme_color": "#0f2257",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tableau de bord",
+      "short_name": "Dashboard",
+      "url": "./#/"
+    },
+    {
+      "name": "Mes notes",
+      "short_name": "Notes",
+      "url": "./#/notes"
+    },
+    {
+      "name": "Réviser aujourd'hui",
+      "short_name": "Révision",
+      "url": "./#/revision"
+    }
+  ]
+}

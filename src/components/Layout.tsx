@@ -1,7 +1,8 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Toasts } from "./ui";
 import { useApp, useActions } from "../store/store";
+import logoUrl from "../assets/logo.png";
 
 const paths: Record<string, string> = {
   dashboard: "M3 12l9-8 9 8M5 10v10h5v-6h4v6h5V10",
@@ -48,6 +49,51 @@ export const NAV = [
   { to: "/parametres", label: "Paramètres", icon: "settings" },
 ];
 
+type InstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+};
+
+function useInstallApp() {
+  const [prompt, setPrompt] = useState<InstallPromptEvent | null>(null);
+  const [installed, setInstalled] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (window.navigator as unknown as { standalone?: boolean }).standalone === true
+    );
+  });
+
+  useEffect(() => {
+    const onPrompt = (event: Event) => {
+      event.preventDefault();
+      setPrompt(event as InstallPromptEvent);
+    };
+    const onInstalled = () => {
+      setInstalled(true);
+      setPrompt(null);
+    };
+    window.addEventListener("beforeinstallprompt", onPrompt);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onPrompt);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
+  }, []);
+
+  async function install() {
+    if (!prompt) return;
+    try {
+      await prompt.prompt();
+      await prompt.userChoice;
+    } finally {
+      setPrompt(null);
+    }
+  }
+
+  return { canInstall: Boolean(prompt) && !installed, install };
+}
+
 function SidebarContent({
   onNavigate,
   onLogout,
@@ -60,15 +106,15 @@ function SidebarContent({
   userObjective?: number;
 }) {
   const { data } = useApp();
+  const { canInstall, install } = useInstallApp();
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center gap-3 px-5 py-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white shadow-lg shadow-brand-600/30">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="12" cy="12" r="9" />
-            <path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" />
-          </svg>
-        </div>
+        <img
+          src={logoUrl}
+          alt="Logo ABL-GOAL"
+          className="h-11 w-11 shrink-0 rounded-xl object-cover shadow-lg ring-1 ring-white/30"
+        />
         <div className="leading-tight">
           <p className="text-sm font-bold text-white">ABL-GOAL</p>
           <p className="text-[11px] text-brand-200">L2 Géomatique</p>
@@ -110,6 +156,14 @@ function SidebarContent({
         <p className="mt-2">
           Objectif : <span className="font-semibold text-white">{data.goals.general}/20</span>
         </p>
+        {canInstall && (
+          <button
+            className="mb-3 w-full rounded-lg bg-brand-500 px-3 py-1.5 text-xs font-semibold text-white shadow-lg shadow-brand-600/30 hover:bg-brand-400"
+            onClick={install}
+          >
+            Installer / Épingler l'application
+          </button>
+        )}
         {onLogout && (
           <button
             className="mt-3 w-full rounded-lg border border-white/20 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/10"
@@ -177,6 +231,11 @@ export default function Layout({
                 <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
               </svg>
             </button>
+            <img
+              src={logoUrl}
+              alt=""
+              className="h-8 w-8 shrink-0 rounded-lg object-cover ring-1 ring-slate-200 dark:ring-slate-700 lg:hidden"
+            />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
                 {current?.label ?? "ABL-GOAL"}
